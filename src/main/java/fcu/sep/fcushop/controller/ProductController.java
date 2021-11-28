@@ -1,41 +1,29 @@
 package fcu.sep.fcushop.controller;
 
-import fcu.sep.fcushop.database.Sql2oDbHandler;
 import fcu.sep.fcushop.model.Product;
 import fcu.sep.fcushop.service.ProductService;
-
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.sql2o.Connection;
+
+import java.util.List;
 
 @RestController
+public class ProductController {
 
-public class ProductController{
   @Autowired
   ProductService productManager;
-  private Sql2oDbHandler sql2oDbHandler;
 
   @GetMapping("/products")
   public List<Product> getProducts() {
-    try (org.sql2o.Connection connection = sql2oDbHandler.getConnector().open()) {
-      String query = "select ID id, NAME name, IMAGE_URL imageUrl, PRICE price, DESCRIPTION description"
-          + " from PRODUCT ";
+    return productManager.getProducts();
 
-      return connection.createQuery(query).executeAndFetch(Product.class);
-    }
   }
-  public List<Product> getProducts(String keyword){
-    try(Connection connection = sql2oDbHandler.getConnector().open()){
-      String query = "select ID id , NAME name,IMAGE_URL imageUrl,PRICE price, DESCRIPTION description"
-          + "form PRODUCT where name = : keyword";
 
-      return connection.createQuery(query)
-          .addParameter(keyword, keyword)
-          .executeAndFetch(Product.class);
-
-    }
+  @GetMapping("/products/{keyword}")
+  public List<Product> getProducts(@PathVariable("keyword") String keyword) {
+    return productManager.getProducts(keyword);
   }
 }
